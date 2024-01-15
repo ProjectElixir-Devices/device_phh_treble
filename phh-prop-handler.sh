@@ -130,6 +130,17 @@ if [ "$1" == "persist.sys.phh.oppo.usbotg" ]; then
     exit
 fi
 
+if [ "$1" == "persist.sys.phh.transsion.usbotg" ]; then
+    if [[ "$prop_value" != "0" && "$prop_value" != "1" ]]; then
+        exit 1
+    fi
+    OTG_PATH=$(find /sys/ -path *tran_battery/OTG_CTL)
+    if [ -n "$OTG_PATH" ]; then
+        echo "$prop_value" >$OTG_PATH
+    fi
+    exit
+fi
+
 if [ "$1" == "persist.sys.phh.allow_binder_thread_on_incoming_calls" ]; then
     if [[ "$prop_value" != "0" && "$prop_value" != "1" ]]; then
         exit 1
