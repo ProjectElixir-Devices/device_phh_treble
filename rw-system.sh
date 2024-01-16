@@ -318,8 +318,6 @@ changeKeylayout() {
     fi
 
     if grep -qE ^cc: /proc/gesture_state;then
-        # Enable dt2w
-        echo cc1 > /proc/gesture_function
         cp /system/phh/tecno-touchpanel.kl /mnt/phh/keylayout/mtk-tpd.kl
         chmod 0644 /mnt/phh/keylayout/mtk-tpd.kl
         changed=true

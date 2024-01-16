@@ -40,6 +40,9 @@ on property:persist.sys.phh.oppo.usbotg=*
 on property:persist.sys.phh.transsion.usbotg=*
     exec u:r:phhsu_daemon:s0 root -- /system/bin/phh-prop-handler.sh "persist.sys.phh.transsion.usbotg"
 
+on property:persist.sys.phh.transsion.dt2w=*
+    exec u:r:phhsu_daemon:s0 root -- /system/bin/phh-prop-handler.sh "persist.sys.phh.transsion.dt2w"
+
 on property:persist.sys.phh.xiaomi.dt2w=*
     exec u:r:phhsu_daemon:s0 root -- /system/bin/phh-prop-handler.sh "persist.sys.phh.xiaomi.dt2w"
 

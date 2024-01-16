@@ -141,6 +141,14 @@ if [ "$1" == "persist.sys.phh.transsion.usbotg" ]; then
     exit
 fi
 
+if [ "$1" == "persist.sys.phh.transsion.dt2w" ]; then
+    if [[ "$prop_value" != "1" && "$prop_value" != "2" ]]; then
+        exit 1
+    fi
+    echo cc${prop_value} > /proc/gesture_function
+    exit
+fi
+
 if [ "$1" == "persist.sys.phh.allow_binder_thread_on_incoming_calls" ]; then
     if [[ "$prop_value" != "0" && "$prop_value" != "1" ]]; then
         exit 1
