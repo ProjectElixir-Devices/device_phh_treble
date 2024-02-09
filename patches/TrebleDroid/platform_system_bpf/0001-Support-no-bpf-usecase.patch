@@ -1,15 +1,15 @@
-From 5f9cb0e089a8f707f6ad6726271e5aadaa197333 Mon Sep 17 00:00:00 2001
+From 0fdf03cd08f1200b4bee92de4fad2fd62a5a971d Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 13 Oct 2021 10:56:52 -0400
 Subject: [PATCH] Support no-bpf usecase
 
 Change-Id: I75a427a2a41aa4ab1104ad88a891bef0dc2d9c91
 ---
- bpfloader/BpfLoader.cpp | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ bpfloader/BpfLoader.cpp | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/bpfloader/BpfLoader.cpp b/bpfloader/BpfLoader.cpp
-index 29fd7f8..158dca6 100644
+index 29fd7f8..2f859ca 100644
 --- a/bpfloader/BpfLoader.cpp
 +++ b/bpfloader/BpfLoader.cpp
 @@ -284,7 +284,9 @@ int main(int argc, char** argv) {
@@ -23,7 +23,7 @@ index 29fd7f8..158dca6 100644
      }
  
      // Note: there's no actual src dir for fs_bpf_loader .o's,
-@@ -292,18 +294,15 @@ int main(int argc, char** argv) {
+@@ -292,17 +294,15 @@ int main(int argc, char** argv) {
      // This is because this is primarily meant for triggering genfscon rules,
      // and as such this will likely always be the case.
      // Thus we need to manually create the /sys/fs/bpf/loader subdirectory.
@@ -42,15 +42,15 @@ index 29fd7f8..158dca6 100644
 -                  "problems or startup script race.");
 -            ALOGE("--- DO NOT EXPECT SYSTEM TO BOOT SUCCESSFULLY ---");
 -	    android::base::SetProperty("bpf.progs_loaded", "1");
--	    return 0;
 +            goto fail;
+ 	    return 0;
          }
      }
- 
-@@ -321,5 +320,13 @@ int main(int argc, char** argv) {
+@@ -321,5 +321,14 @@ int main(int argc, char** argv) {
          return 1;
      }
  
++
 +    return 0;
 +fail:
 +    ALOGE("=== CRITICAL FAILURE LOADING BPF PROGRAMS ===");

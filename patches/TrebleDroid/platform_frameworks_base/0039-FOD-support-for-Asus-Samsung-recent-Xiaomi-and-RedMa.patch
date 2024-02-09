@@ -1,4 +1,4 @@
-From 114e8a7bd6ff6685c72d418e72ba50da2c404bea Mon Sep 17 00:00:00 2001
+From f7644db902512e395c53b7eb99cdd163953532ed Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 18 Dec 2022 18:20:40 -0500
 Subject: [PATCH] FOD support for Asus, Samsung recent Xiaomi and RedMagic 8
@@ -16,16 +16,16 @@ Co-authored-by: Huy Hoang
 Change-Id: Ibd0f9ea8fba584a38c060fd9271549a5e106b4eb
 ---
  packages/SystemUI/Android.bp                  |   4 +
- .../systemui/biometrics/UdfpsController.java  |  56 ++++
+ .../systemui/biometrics/UdfpsController.java  |  57 ++++
  .../biometrics/UdfpsControllerOverlay.kt      |   6 +-
  .../android/systemui/biometrics/UdfpsView.kt  | 220 +++++++++++++
  services/core/Android.bp                      |   5 +
  .../server/biometrics/AuthService.java        | 296 +++++++++++++++++-
  .../fingerprint/FingerprintService.java       |   3 +-
- 7 files changed, 584 insertions(+), 6 deletions(-)
+ 7 files changed, 585 insertions(+), 6 deletions(-)
 
 diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
-index 81e1df33..bb96bd99 100644
+index 1f90363f..91a50779 100644
 --- a/packages/SystemUI/Android.bp
 +++ b/packages/SystemUI/Android.bp
 @@ -202,6 +202,10 @@ android_library {
@@ -40,10 +40,10 @@ index 81e1df33..bb96bd99 100644
      manifest: "AndroidManifest.xml",
      additional_manifests: ["CustomManifest.xml"],
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-index 8b0c19f5..5ed96351 100644
+index 207f6e35..d56094ca 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-@@ -53,6 +53,7 @@ import android.os.Handler;
+@@ -54,6 +54,7 @@ import android.os.Handler;
  import android.os.PowerManager;
  import android.os.Process;
  import android.os.Trace;
@@ -51,7 +51,7 @@ index 8b0c19f5..5ed96351 100644
  import android.os.UserHandle;
  import android.os.VibrationAttributes;
  import android.os.VibrationEffect;
-@@ -122,9 +123,13 @@ import java.util.HashSet;
+@@ -124,9 +125,13 @@ import java.util.HashSet;
  import java.util.Optional;
  import java.util.Set;
  import java.util.concurrent.Executor;
@@ -65,7 +65,7 @@ index 8b0c19f5..5ed96351 100644
  
  /**
   * Shows and hides the under-display fingerprint sensor (UDFPS) overlay, handles UDFPS touch events,
-@@ -268,6 +273,46 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -272,6 +277,46 @@ public class UdfpsController implements DozeReceiver, Dumpable {
              mScreenOn = false;
          }
      };
@@ -112,14 +112,14 @@ index 8b0c19f5..5ed96351 100644
  
      @Override
      public void dump(@NonNull PrintWriter pw, @NonNull String[] args) {
-@@ -1299,10 +1344,17 @@ public class UdfpsController implements DozeReceiver, Dumpable {
-                 view.configureDisplay(() -> dispatchOnUiReady(requestId));
+@@ -1325,9 +1370,17 @@ public class UdfpsController implements DozeReceiver, Dumpable {
              }
          }
-+        if(SystemProperties.get("ro.vendor.build.fingerprint").contains("nubia/NX669")) {
-+          processCmd(13, 0, 0, new byte[0], 0);
-+        }
  
++        if(SystemProperties.get("ro.vendor.build.fingerprint").contains("nubia/NX669")) {
++           processCmd(13, 0, 0, new byte[0], 0);
++        }
++
          for (Callback cb : mCallbacks) {
              cb.onFingerDown();
          }
@@ -127,10 +127,10 @@ index 8b0c19f5..5ed96351 100644
 +          processCmd(14, 0, 0, new byte[0], 0);
 +        }
 +
-     }
- 
-     private void onFingerUp(long requestId, @NonNull UdfpsView view) {
-@@ -1353,6 +1405,10 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         if (mUdfpsAnimation != null) {
+             mUdfpsAnimation.show();
+         }
+@@ -1381,6 +1434,10 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                      mFingerprintManager.onPointerUp(requestId, mSensorProps.sensorId);
                  }
              }
@@ -142,7 +142,7 @@ index 8b0c19f5..5ed96351 100644
                  cb.onFingerUp();
              }
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
-index 4c6e593e..b0482c7a 100644
+index cb121eae..9b40aac8 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
 @@ -135,7 +135,8 @@ class UdfpsControllerOverlay @JvmOverloads constructor(
