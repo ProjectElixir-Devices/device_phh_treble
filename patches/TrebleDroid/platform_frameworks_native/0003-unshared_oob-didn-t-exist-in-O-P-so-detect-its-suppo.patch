@@ -1,15 +1,15 @@
-From a9d55fcfe5992b97de3ae56a14e62f8245f8890b Mon Sep 17 00:00:00 2001
+From 9533046bad59fcf16dfcb633c136534badfa72b5 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 5 Jan 2021 23:44:00 +0100
-Subject: [PATCH 3/9] unshared_oob didn't exist in O/P, so detect its supported
- based on vndk version
+Subject: [PATCH 03/11] unshared_oob didn't exist in O/P, so detect its
+ supported based on vndk version
 
 ---
  cmds/installd/migrate_legacy_obb_data.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/cmds/installd/migrate_legacy_obb_data.sh b/cmds/installd/migrate_legacy_obb_data.sh
-index 7399681..9d5b73e 100644
+index 7399681c3e..9d5b73eae2 100644
 --- a/cmds/installd/migrate_legacy_obb_data.sh
 +++ b/cmds/installd/migrate_legacy_obb_data.sh
 @@ -18,7 +18,7 @@
@@ -22,5 +22,5 @@ index 7399681..9d5b73e 100644
    rm -rf /data/media/0/Android/obb/test_probe
    exit 0
 -- 
-2.43.0
+2.25.1
 

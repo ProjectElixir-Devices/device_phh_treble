@@ -56,4 +56,5 @@
     <string name="config_wlan_data_service_package">com.google.android.iwlan</string>
     <string name="config_wlan_network_service_package">com.google.android.iwlan</string>
   <string name="config_qualified_networks_service_package">com.android.telephony.qns</string>
+  <bool name="config_lidControlsSleep">true</bool>
 </resources>

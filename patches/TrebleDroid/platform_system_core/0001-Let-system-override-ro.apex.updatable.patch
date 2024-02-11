@@ -1,7 +1,7 @@
-From d2b0d773cceedfed54233190cea80b166a31abf1 Mon Sep 17 00:00:00 2001
+From 8755aaec529a81aeb1d4b538d1610e4c71f9fddb Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 23 Feb 2022 17:37:47 -0500
-Subject: [PATCH 01/22] Let system override ro.apex.updatable
+Subject: [PATCH 01/26] Let system override ro.apex.updatable
 
 APEX are broken because of a kernel bug in Android 10 devices
 So we have system set ro.apex.updatable = false
@@ -13,10 +13,10 @@ So, ignore the override policy for this prop
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/init/property_service.cpp b/init/property_service.cpp
-index e86dbb6..d37d03a 100644
+index 8da69822c..545c25e26 100644
 --- a/init/property_service.cpp
 +++ b/init/property_service.cpp
-@@ -790,8 +790,12 @@ static void LoadProperties(char* data, const char* filter, const char* filename,
+@@ -787,8 +787,12 @@ static void LoadProperties(char* data, const char* filter, const char* filename,
                  } else if (it->second != value) {
                      LOG(WARNING) << "Overriding previous property '" << key << "':'" << it->second
                                   << "' with new value '" << value << "'";
@@ -32,5 +32,5 @@ index e86dbb6..d37d03a 100644
                  LOG(ERROR) << "Do not have permissions to set '" << key << "' to '" << value
                             << "' in property file '" << filename << "': " << error;
 -- 
-2.43.0
+2.25.1
 

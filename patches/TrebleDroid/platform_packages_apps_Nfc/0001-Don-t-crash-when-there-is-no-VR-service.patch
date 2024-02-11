@@ -1,4 +1,4 @@
-From ff0fd458cd7c96f76fd584b64ebfe0c085f2320b Mon Sep 17 00:00:00 2001
+From 979358640c18f464b9ab0254734c7c2d7b91789c Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Fri, 20 Oct 2023 13:02:43 -0400
 Subject: [PATCH] Don't crash when there is no VR service
@@ -9,10 +9,10 @@ Change-Id: I02d672f9a2688df7b1abf16377634fdcf4132511
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/com/android/nfc/NfcService.java b/src/com/android/nfc/NfcService.java
-index f8fde5c..069c6c1 100644
+index 662112a0..d3e9d2d1 100644
 --- a/src/com/android/nfc/NfcService.java
 +++ b/src/com/android/nfc/NfcService.java
-@@ -575,7 +575,11 @@ public class NfcService implements DeviceHostListener, ForegroundUtils.Callback
+@@ -572,7 +572,11 @@ public class NfcService implements DeviceHostListener, ForegroundUtils.Callback
          mActivityManager = mContext.getSystemService(ActivityManager.class);
          mVibrator = mContext.getSystemService(Vibrator.class);
          mVibrationEffect = VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE);
@@ -26,5 +26,5 @@ index f8fde5c..069c6c1 100644
          mScreenState = mScreenStateHelper.checkScreenState();
  
 -- 
-2.34.1
+2.25.1
 

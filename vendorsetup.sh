@@ -40,7 +40,7 @@ rm -rf vendor/vndk-tests
 git clone https://github.com/phhusson/vendor_vndk-tests vendor/vndk-tests -b master --depth 1
 
 rm -rf vendor/interfaces
-git clone https://github.com/trebledroid/vendor_interfaces vendor/interfaces -b android-13.0 --depth 1
+git clone https://github.com/trebledroid/vendor_interfaces vendor/interfaces -b android-14.0 --depth 1
 
 rm -rf vendor/lptools
 git clone https://github.com/phhusson/vendor_lptools vendor/lptools -b master --depth 1

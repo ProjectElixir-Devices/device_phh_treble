@@ -1,0 +1,87 @@
+From 1aeb914e9ca4d9952fbe07de00118cb59441ed53 Mon Sep 17 00:00:00 2001
+From: MrHereAndThere <38396158+boydaihungst@users.noreply.github.com>
+Date: Fri, 17 Nov 2023 09:22:29 +0700
+Subject: [PATCH] fix(fod): Extra Dim overlap fod overlay
+
+Extra Dim will set display panel brightness to lowest value possible, which will also effect FOD overlay.
+---
+ .../systemui/biometrics/UdfpsController.java  | 21 ++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index d56094ca..e7c9d83b 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -47,6 +47,7 @@ import android.hardware.fingerprint.FingerprintSensorProperties;
+ import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
+ import android.hardware.fingerprint.IUdfpsOverlayController;
+ import android.hardware.fingerprint.IUdfpsOverlayControllerCallback;
++import android.hardware.display.ColorDisplayManager;
+ import android.hardware.input.InputManager;
+ import android.net.Uri;
+ import android.os.Build;
+@@ -195,6 +196,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+     @NonNull private final UdfpsUtils mUdfpsUtils;
+     @NonNull private final InputManager mInputManager;
+     @NonNull private final UdfpsKeyguardAccessibilityDelegate mUdfpsKeyguardAccessibilityDelegate;
++    @NonNull private final ColorDisplayManager mColorDisplayManager;
++    private boolean mIgnoreExtraDim;
+     private final boolean mIgnoreRefreshRate;
+ 
+     // Currently the UdfpsController supports a single UDFPS sensor. If devices have multiple
+@@ -944,7 +947,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+             @NonNull UdfpsUtils udfpsUtils,
+             @NonNull KeyguardFaceAuthInteractor keyguardFaceAuthInteractor,
+             @NonNull UdfpsKeyguardAccessibilityDelegate udfpsKeyguardAccessibilityDelegate,
+-            @NonNull Provider<UdfpsKeyguardViewModels> udfpsKeyguardViewModelsProvider) {
++            @NonNull Provider<UdfpsKeyguardViewModels> udfpsKeyguardViewModelsProvider,
++            @NonNull ColorDisplayManager colorDisplayManager) {
+         mContext = context;
+         mExecution = execution;
+         mVibrator = vibrator;
+@@ -992,6 +996,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         mUdfpsUtils = udfpsUtils;
+         mInputManager = inputManager;
+         mUdfpsKeyguardAccessibilityDelegate = udfpsKeyguardAccessibilityDelegate;
++        mColorDisplayManager = colorDisplayManager;
+ 
+         mTouchProcessor = mFeatureFlags.isEnabled(Flags.UDFPS_NEW_TOUCH_DETECTION)
+                 ? singlePointerTouchProcessor : null;
+@@ -1097,6 +1102,12 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+ 
+     private void showUdfpsOverlay(@NonNull UdfpsControllerOverlay overlay) {
+         mExecution.assertIsMainThread();
++
++        mIgnoreExtraDim = mColorDisplayManager.isReduceBrightColorsActivated();
++        if (mIgnoreExtraDim) {
++            Log.d(TAG, "Current extra dim state (showUdfpsOverlay): " + mIgnoreExtraDim);
++        }
++
+         mFrameworkDimming = mContext.getResources().getBoolean(R.bool.config_udfpsFrameworkDimming);
+         parseBrightnessAlphaArray();
+ 
+@@ -1327,6 +1338,10 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+             return;
+         }
+         if (isOptical()) {
++            if (mIgnoreExtraDim) {
++                mColorDisplayManager.setReduceBrightColorsActivated(false);
++                Log.d(TAG, "Extra dim disabled");
++            }
+             mLatencyTracker.onActionStart(LatencyTracker.ACTION_UDFPS_ILLUMINATE);
+         }
+         // Refresh screen timeout and boost process priority if possible.
+@@ -1417,6 +1432,10 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         mActivePointerId = -1;
+         mAcquiredReceived = false;
+         if (mOnFingerDown) {
++            if (mIgnoreExtraDim && isOptical()) {
++                mColorDisplayManager.setReduceBrightColorsActivated(true);
++                Log.d(TAG, "Extra dim restored");
++            }
+             if (mAlternateTouchProvider != null) {
+                 mBiometricExecutor.execute(() -> {
+                     mAlternateTouchProvider.onPointerUp(requestId);
+-- 
+2.34.1
+
