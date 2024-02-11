@@ -41,6 +41,9 @@ PRODUCT_USE_SCUDO := true
 # Prebuilt Sepolicy
 TARGET_USES_PREBUILT_VENDOR_SEPOLICY := true
 
+# Share blocks
+BOARD_EXT4_SHARE_DUP_BLOCKS := true
+
 # GMS
 ifeq ($(WITH_GMS),true)
 GMS_MAKEFILE=gms_minimal.mk
